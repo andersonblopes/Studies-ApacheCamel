@@ -14,13 +14,15 @@ public class RotaPedidos {
 
 			@Override
 			public void configure() throws Exception {
-				from("file:pedidos?delay=15s&noop=true")
-				.log("${exchange.pattern}") 
-				.log("Cammel working..." + "Id: ${id} " + "Body: ${body}")
-				.marshal().xmljson()
-				.log("Cammel anyway working..." + "Id: ${id} " + "Body: ${body}")
-				.setHeader("CamelFileName", simple("${file:name.noext}.json"))
-				.to("file:saida");
+				from("file:pedidos?delay=15s&noop=true").
+					split().
+						xpath("/pedido/itens/item").
+					filter().
+						xpath("/item/formato[text() = 'EBOOK']").
+				marshal().xmljson().
+				log("${id} - ${body}").
+				setHeader("CamelFileName", simple("${file:name.noext}.json")).
+				to("file:saida");
 			}
 		});
 
