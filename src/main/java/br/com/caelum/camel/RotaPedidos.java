@@ -15,13 +15,17 @@ public class RotaPedidos {
 			@Override
 			public void configure() throws Exception {
 				from("file:pedidos?delay=15s&noop=true")
+				.log("${exchange.pattern}") 
 				.log("Cammel working..." + "Id: ${id} " + "Body: ${body}")
+				.marshal().xmljson()
+				.log("Cammel anyway working..." + "Id: ${id} " + "Body: ${body}")
+				.setHeader("CamelFileName", simple("${file:name.noext}.json"))
 				.to("file:saida");
 			}
 		});
 
 		context.start();
 		Thread.sleep(20000);
-
+		context.stop();
 	}
 }
