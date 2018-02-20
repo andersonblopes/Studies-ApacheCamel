@@ -1,6 +1,7 @@
 package br.com.caelum.camel;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
 public class RotaPedidos {
@@ -9,5 +10,18 @@ public class RotaPedidos {
 
 		CamelContext context = new DefaultCamelContext();
 
-	}	
+		context.addRoutes(new RouteBuilder() {
+
+			@Override
+			public void configure() throws Exception {
+				from("file:pedidos?delay=15s&noop=true")
+				.log("Cammel working..." + "Id: ${id} " + "Body: ${body}")
+				.to("file:saida");
+			}
+		});
+
+		context.start();
+		Thread.sleep(20000);
+
+	}
 }
